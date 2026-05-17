@@ -980,7 +980,7 @@ _CONFIGS = [
         ),
         
         data=LeRobotDROIDDataConfig(
-            repo_id="bartek-niedzielski/panda_pick_and_place_110", 
+            repo_id="bartek-niedzielski/panda_pick_task_velocity", 
             base_config=DataConfig(prompt_from_task=True),
             assets=AssetsConfig(
                 assets_dir="gs://openpi-assets/checkpoints/pi05_droid/assets",
