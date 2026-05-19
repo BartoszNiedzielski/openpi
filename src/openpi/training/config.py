@@ -975,8 +975,8 @@ _CONFIGS = [
             pi05=True,
             action_dim=32,
             action_horizon=16,
-            paligemma_variant="gemma_2b_lora",
-            action_expert_variant="gemma_300m_lora"
+            paligemma_variant="gemma_2b_lora_rank_4",
+            action_expert_variant="gemma_300m_lora_rank_4"
         ),
         
         data=LeRobotDROIDDataConfig(
@@ -999,8 +999,8 @@ _CONFIGS = [
         # 2. Tell the trainer exactly which weights to freeze using the LoRA config
         freeze_filter=pi0_config.Pi0Config(
             pi05=True,
-            paligemma_variant="gemma_2b_lora", 
-            action_expert_variant="gemma_300m_lora"
+            paligemma_variant="gemma_2b_lora_rank_4", 
+            action_expert_variant="gemma_300m_lora_rank_4"
         ).get_freeze_filter(),
         
         # 3. Turn off EMA (Exponential Moving Average) as it clashes with LoRA training
