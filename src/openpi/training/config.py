@@ -984,8 +984,8 @@ _CONFIGS = [
             base_config=DataConfig(prompt_from_task=True),
             assets=AssetsConfig(
                 assets_dir="gs://openpi-assets/checkpoints/pi05_base/assets",
-                asset_id="franka",
-                # asset_id="droid",
+                # asset_id="franka",
+                asset_id="droid",
                 # check franka for asset_id if you are using the original panda dataset with 7-dim joint position actions; 
                 # check droid if you are using the new droid dataset with 7-dim joint velocity actions
             ),
