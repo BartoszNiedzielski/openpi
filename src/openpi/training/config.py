@@ -992,6 +992,7 @@ _CONFIGS = [
             ),
         ),
         weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_base/params"),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_droid/params"),
         # short training with frequent saves so we can pick out a checkpoint that generalizes well to the target 
         # task before overfitting occurs.
         batch_size=16,
