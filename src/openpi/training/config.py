@@ -20,6 +20,7 @@ import openpi.models.tokenizer as _tokenizer
 import openpi.policies.aloha_policy as aloha_policy
 import openpi.policies.droid_policy as droid_policy
 import openpi.policies.libero_policy as libero_policy
+import openpi.policies.panda_policy as panda_policy
 import openpi.shared.download as _download
 import openpi.shared.normalize as _normalize
 import openpi.training.droid_rlds_dataset as droid_rlds_dataset
@@ -460,7 +461,14 @@ class LeRobotDROIDDataConfig(DataConfigFactory):
             model_transforms=model_transforms,
         )
 
-class LeRobotPandaPosDataConfig(DataConfigFactory):
+class LeRobotPandaDataConfig(DataConfigFactory):
+
+    # treat dataset actions as absolute joint targets and convert to deltas for
+    # training; the inverse runs at inference so the model output is absolute again.
+    # the recorder (panda/record_data_lerobot_format.py) stores forward-looking
+    # absolute actions, action[i] = state[i+1]
+    use_delta_action_transform: bool = True
+
     @override
     def create(self, assets_dirs: pathlib.Path, model_config: _model.BaseModelConfig) -> DataConfig:
         repack_transform = _transforms.Group(
@@ -480,16 +488,31 @@ class LeRobotPandaPosDataConfig(DataConfigFactory):
         
         # joint positions instead of velocity
         data_transforms = _transforms.Group(
-            inputs=[droid_policy.DroidInputs(model_type=model_config.model_type)],
-            outputs=[droid_policy.DroidOutputs()], 
+            inputs=[panda_policy.PandaInputs(model_type=model_config.model_type)],
+            outputs=[panda_policy.PandaOutputs()], 
         )
+
+        if self.use_delta_action_transform:
+            delta_action_mask = _transforms.make_bool_mask(7, -1)
+            data_transforms = data_transforms.push(
+                inputs=[_transforms.DeltaActions(delta_action_mask)],
+                outputs=[_transforms.AbsoluteActions(delta_action_mask)],
+            )
+
+        # model transforms tokenize the prompt and action targets
         model_transforms = ModelTransformFactory()(model_config)
+
+        # pi0/pi05 use z-score (more stable on small datasets); pi0_fast must keep
+        # quantile normalization because the FAST tokenizer expects inputs in [-1, 1]
+        # binned into 256 buckets. see https://github.com/Physical-Intelligence/openpi/issues/763
+        use_quantile = model_config.model_type == ModelType.PI0_FAST
 
         return dataclasses.replace(
             self.create_base_config(assets_dirs, model_config),
             repack_transforms=repack_transform,
             data_transforms=data_transforms,
             model_transforms=model_transforms,
+            use_quantile=use_quantile,
         )
 
 
@@ -949,23 +972,35 @@ _CONFIGS = [
     ),
     #my train config
     TrainConfig(
-        name="pi05_panda_pos_finetune",
+        name="pi05_panda",
         model=pi0_config.Pi0Config(
             pi05=True,
             action_dim=32,
-            action_horizon=16,
+            action_horizon=15,
+            max_token_len=180
         ),
-        data=LeRobotPandaPosDataConfig(
-            repo_id="bartek-niedzielski/panda_pick_and_place_40", # Uzupełnisz w terminalu flagą --data.repo-id
+        data=LeRobotPandaDataConfig(
+            repo_id="bartek-niedzielski/pick_and_place_40",
             base_config=DataConfig(prompt_from_task=True),
             assets=AssetsConfig(
-                assets_dir="gs://openpi-assets/checkpoints/pi05_droid/assets",
-                asset_id="droid",
+                assets_dir="gs://openpi-assets/checkpoints/pi05_base/assets",
+                asset_id="franka",
+                # asset_id="droid",
+                # check franka for asset_id if you are using the original panda dataset with 7-dim joint position actions; 
+                # check droid if you are using the new droid dataset with 7-dim joint velocity actions
             ),
         ),
-        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_droid/params"),
-        num_train_steps=1000,
-        batch_size=8,
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_base/params"),
+        # short training with frequent saves so we can pick out a checkpoint that generalizes well to the target 
+        # task before overfitting occurs.
+        batch_size=16,
+        num_train_steps=500,
+        lr_schedule=_optimizer.CosineDecaySchedule(warmup_steps=50, peak_lr=2.5e-5, decay_steps=500),
+        # think about adopting early stopping based on validation performance for future experiments with small datasets like this one
+        log_interval=10,
+        save_interval=50,
+        keep_period=50, # since the dataset is small and we are likely to overfit after a few hundred steps, we want to keep all checkpoints for later analysis
+        policy_metadata={"reset_pose": [0.014956191182136536, -0.7276245951652527, -0.013290399685502052, -2.630627393722534, -0.002800906077027321, 1.8845188617706299, 0.7778761386871338]}
     ),
     TrainConfig(
         name="pi05_panda_vel_finetune",

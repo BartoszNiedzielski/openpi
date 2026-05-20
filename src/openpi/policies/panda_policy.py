@@ -10,7 +10,6 @@ from openpi.models import model as _model
 def make_panda_example() -> dict:
     """Creates a random input example for the Panda policy."""
     return {
-        # Removed "observation/" prefix
         "exterior_image_1_left": np.random.randint(256, size=(224, 224, 3), dtype=np.uint8),
         "wrist_image_left": np.random.randint(256, size=(224, 224, 3), dtype=np.uint8),
         "joint_position": np.random.rand(7),
@@ -34,19 +33,15 @@ class PandaInputs(transforms.DataTransformFn):
     model_type: _model.ModelType
 
     def __call__(self, data: dict) -> dict:
-        # Removed "observation/" prefix
         gripper_pos = np.asarray(data["gripper_position"])
         if gripper_pos.ndim == 0:
             # Ensure gripper position is a 1D array, not a scalar, so we can concatenate with joint positions
             gripper_pos = gripper_pos[np.newaxis]
-            
-        # Removed "observation/" prefix
+        
         state = np.concatenate([data["joint_position"], gripper_pos])
 
         # Possibly need to parse images to uint8 (H,W,C) since LeRobot automatically
         # stores as float32 (C,H,W), gets skipped for policy inference
-        
-        # Removed "observation/" prefix
         base_image = _parse_image(data["exterior_image_1_left"])
         wrist_image = _parse_image(data["wrist_image_left"])
 
@@ -84,5 +79,5 @@ class PandaInputs(transforms.DataTransformFn):
 class PandaOutputs(transforms.DataTransformFn):
     def __call__(self, data: dict) -> dict:
         # Only return the first 8 dims.
-        # This works perfectly for your 8D actions (7 velocities + 1 gripper)
+        # This works perfectly for your 8D actions (7 joint positions + 1 gripper)
         return {"actions": np.asarray(data["actions"][:, :8])}
