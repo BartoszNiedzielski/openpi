@@ -106,7 +106,7 @@ def get_config(variant: Variant) -> Config:
             head_dim=256,
             lora_configs={"attn": lora.LoRAConfig(rank=32, alpha=32.0), "ffn": lora.LoRAConfig(rank=32, alpha=32.0)},
         )
-      if variant == "gemma_2b_lora_rank_4":
+    if variant == "gemma_2b_lora_rank_4":
         return Config(
             width=2048,
             depth=18,
