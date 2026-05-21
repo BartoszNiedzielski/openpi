@@ -983,21 +983,21 @@ _CONFIGS = [
             repo_id="bartek-niedzielski/pick_and_place_40",
             base_config=DataConfig(prompt_from_task=True),
             assets=AssetsConfig(
-                # assets_dir="gs://openpi-assets/checkpoints/pi05_base/assets", # reuse the original pi05 norm stats
-                assets_dir="gs://openpi-assets/checkpoints/pi05_droid/assets",  # reuse the original droid norm stats since we are using the droid asset for this dataset
+                assets_dir="gs://openpi-assets/checkpoints/pi05_base/assets", # reuse the original pi05 norm stats
+                # assets_dir="gs://openpi-assets/checkpoints/pi05_droid/assets",  # reuse the original droid norm stats since we are using the droid asset for this dataset
                 # asset_id="franka",
                 asset_id="droid",
                 # check franka for asset_id if you are using the original panda dataset with 7-dim joint position actions; 
                 # check droid if you are using the new droid dataset with 7-dim joint velocity actions
             ),
         ),
-        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_base/params"),
-        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_droid/params"),
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_base/params"), #load pi05 base as base for finetuning
+        # weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_droid/params"), #load pi05 droid as base for finetuning
         # short training with frequent saves so we can pick out a checkpoint that generalizes well to the target 
         # task before overfitting occurs.
         batch_size=16,
         num_train_steps=500,
-        lr_schedule=_optimizer.CosineDecaySchedule(warmup_steps=50, peak_lr=2.5e-5, decay_steps=500),
+        lr_schedule=_optimizer.CosineDecaySchedule(warmup_steps=50, peak_lr=2.5e-5, decay_steps=500), #TODO check decay_steps=30000 or some other big number
         # think about adopting early stopping based on validation performance for future experiments with small datasets like this one
         log_interval=10,
         save_interval=50,

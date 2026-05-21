@@ -38,6 +38,8 @@ dependencies = [
     "transformers==4.53.2",
     "rich>=14.0.0",
     "polars>=1.30.0",
+    "huggingface-hub[cli]>=0.32.3",
+    "panda-python>=0.8.1",
 ]
 
 
