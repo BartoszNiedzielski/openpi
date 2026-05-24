@@ -999,7 +999,7 @@ _CONFIGS = [
         # task before overfitting occurs.
         batch_size=16,
         num_train_steps=240,
-        lr_schedule=_optimizer.CosineDecaySchedule(warmup_steps=50, peak_lr=1e-5, decay_steps=240),
+        lr_schedule=_optimizer.CosineDecaySchedule(warmup_steps=15, peak_lr=1e-5, decay_steps=240),
         # think about adopting early stopping based on validation performance for future experiments with small datasets like this one
         log_interval=10,
         save_interval=50,
