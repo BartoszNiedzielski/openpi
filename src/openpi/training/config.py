@@ -980,7 +980,7 @@ _CONFIGS = [
             max_token_len=180
         ),
         data=LeRobotPandaDataConfig(
-            repo_id="bartek-niedzielski/long_lying_pick_and_place_20",
+            repo_id="bartek-niedzielski/long_lying_pick_and_place_10",
             base_config=DataConfig(prompt_from_task=True),
             assets=AssetsConfig(
                 assets_dir="gs://openpi-assets/checkpoints/pi05_base/assets", # reuse the original pi05 norm stats
@@ -998,8 +998,13 @@ _CONFIGS = [
         # short training with frequent saves so we can pick out a checkpoint that generalizes well to the target 
         # task before overfitting occurs.
         batch_size=16,
-        num_train_steps=240,
-        lr_schedule=_optimizer.CosineDecaySchedule(warmup_steps=15, peak_lr=5e-6, decay_steps=240),
+        # for slower robot
+        # num_train_steps=240,
+        # lr_schedule=_optimizer.CosineDecaySchedule(warmup_steps=15, peak_lr=5e-6, decay_steps=240),
+
+        # for faster robot we can train for more steps with a higher learning rate
+        num_train_steps=500,
+        lr_schedule=_optimizer.CosineDecaySchedule(warmup_steps=50, peak_lr=2.5e-5, decay_steps=500),
         # think about adopting early stopping based on validation performance for future experiments with small datasets like this one
         log_interval=10,
         save_interval=50,
