@@ -999,12 +999,12 @@ _CONFIGS = [
         # task before overfitting occurs.
         batch_size=16,
         # for slower robot
-        num_train_steps=240,
-        lr_schedule=_optimizer.CosineDecaySchedule(warmup_steps=15, peak_lr=5e-6, decay_steps=240),
+        # num_train_steps=240,
+        # lr_schedule=_optimizer.CosineDecaySchedule(warmup_steps=15, peak_lr=5e-6, decay_steps=240),
 
         # for faster robot we can train for more steps with a higher learning rate
-        # num_train_steps=500,
-        # lr_schedule=_optimizer.CosineDecaySchedule(warmup_steps=50, peak_lr=2.5e-5, decay_steps=500),
+        num_train_steps=500,
+        lr_schedule=_optimizer.CosineDecaySchedule(warmup_steps=50, peak_lr=2.5e-5, decay_steps=500),
         # think about adopting early stopping based on validation performance for future experiments with small datasets like this one
         log_interval=10,
         save_interval=50,
