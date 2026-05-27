@@ -22,14 +22,13 @@ INSTRUCTION = "place the green cube in the yellow area"
 
 print("[*] Loading local fine-tuned Pi05 Base droid model...")
 # CHECKPOINT_DIR = "/home/student/ft/checkpoints/pi05_base_droid/150/"
-# CHECKPOINT_DIR = "/home/student/ft/checkpoints/pi05_base_droid_standing_10_lr_5e-6_warmup_15/60/"
-# CHECKPOINT_DIR = "/home/student/ft/checkpoints/pi05_base_droid_fast_40_lr_2.5e-5/200/"
-# CHECKPOINT_DIR = "/home/student/ft/checkpoints/pi05_base_droid_fast_40_lr_2.5e-5/150/"
-# CHECKPOINT_DIR = "/home/student/ft/checkpoints/pi05_base_droid_fast_40_lr_2.5e-5/350/"
-# CHECKPOINT_DIR = "/home/student/ft/checkpoints/pi05_base_droid_fast_40_lr_2.5e-5/499/"
+CHECKPOINT_DIR = "/home/student/ft/checkpoints/pi05_base_droid_fast_40_lr_2.5e-5/350/"
 
-CHECKPOINT_DIR = "/home/student/ft/checkpoints/pi05_base_droid_fast_30_lr_2.5e-5/350/"
-# CHECKPOINT_DIR = "/home/student/ft/checkpoints/pi05_base_droid_fast_30_lr_2.5e-5/200/"
+
+# CHECKPOINT_DIR = "/home/student/ft/checkpoints/pi05_base_droid_fast_30_lr_2.5e-5/350/"
+# CHECKPOINT_DIR = "/home/student/ft/checkpoints/pi05_base_droid_fast_20_lr_2.5e-5/300/"
+# CHECKPOINT_DIR = "/home/student/ft/checkpoints/pi05_base_droid_fast_10_lr_2.5e-5/200/"
+
 pi0_config = _config.get_config("pi05_panda") #remember to check config.py if it matches
 
 # CHECKPOINT_DIR = download.maybe_download("gs://openpi-assets/checkpoints/pi05_base")
@@ -44,7 +43,7 @@ DT = 1.0 / CONTROL_HZ
 # --- CAMERA CONFIGURATION ---
 EXTERIOR_CAMERA_INDEX = 2
 WRIST_CAMERA_INDEX = 0
-MIN_STEPS_PER_CHUNK = 6 # 3 doesnt work, 6 base value, 9 works similar to 6 needs more testing, 12 works less good
+MIN_STEPS_PER_CHUNK = 3 # 3 doesnt work, 6 base value, 9 works similar to 6 needs more testing, 12 works less good
 
 TEST_VISION_INFLUENCE = False
 
